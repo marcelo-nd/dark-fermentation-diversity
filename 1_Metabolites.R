@@ -4,7 +4,7 @@ library("ggplot2")
 library("ggthemes")
 library("dplyr")
 
-source("C:/Users/marce/OneDrive/DiversidadH2/1_scripts/DA_helper_functions.R")
+source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
 # Biogas
 ####################################################################################
@@ -28,11 +28,13 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
   ylab("Production (biogas mL/L)") +
   ggtitle("Biogas produced (n = 12)") +
   theme_few() +
-  geom_vline(xintercept = c(0, 27, 60), color = "#74AA50", alpha = 0.2 , size = 2) +
-  geom_vline(xintercept = c(0, 1, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 26, 27, 47, 53, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
-  #geom_vline(xintercept = c(0, 4, 7, 11, 14, 18, 21, 25, 27, 48, 54, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
-  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=10),
+  #geom_vline(xintercept = c(0, 27, 60), color = "#74AA50", alpha = 0.2 , size = 2) +
+  #geom_vline(xintercept = c(0, 1, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 26, 27, 47, 53, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  geom_vline(xintercept = c(0, 4, 7, 11, 14, 21, 23, 27, 47, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=7, angle = 45),
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
+
+#theme(axis.text.x = element_text(angle = 60, vjust = 0.5, hjust=1))
 ####################################################################################
 # AGVs
 ####################################################################################

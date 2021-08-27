@@ -2,11 +2,12 @@ library("dplyr")
 library("corrplot")
 library("vegan")
 library("tidyr")
-source("C:/Users/marce/OneDrive/DiversidadH2/1_scripts/DA_helper_functions.R")
+
+source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
 # Read Data
 ####################################################################################
-otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table.csv", row.names = 1)
+otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_rare.csv", row.names = 1)
 
 metabolite_data <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/metabolite_data.csv", row.names = 1)
 
@@ -14,7 +15,7 @@ metabolite_data <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/m
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
 alta_diversidad <- filter_otus_by_counts_col_percent(alta_diversidad, min_count = 20, percentage = 0.20)
 
-write.csv(alta_diversidad, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/alta_diversidad_20.csv", row.names =  TRUE)
+write.csv(alta_diversidad, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/alta_diversidad_20_rare.csv", row.names =  TRUE)
 ####################################################################################
 
 # Correlation Heatmap
@@ -55,8 +56,7 @@ colnames(adXm)[1] <- "species"
 adXm_g <- gather(adXm, "Acetico", "Butirico", "Isobutirico", "Isovalerico", "Propionico", "Valerico", "Biogas", key = "compound", value = "correlation")
 
 # Getting significance data
-
-adxm.pval <- as.data.frame(rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 25:31][1:24,])
+adxm.pval <- as.data.frame(rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 23:29][1:22,])
 # Converting rownames to column 1
 adxm.pval <- cbind(rownames(adxm.pval), data.frame(adxm.pval, row.names=NULL))
 colnames(adxm.pval)[1] <- "species"
@@ -122,21 +122,22 @@ for (sample in row.names(metab_mat)) {
   sample_names <- c(sample_names, paste(sample_splt[[1]][1], sample_splt[[1]][2], sep = "."))
 }
 
-colvec <- c("red2", "green4", "mediumblue", "darkorange4", "aquamarine4", "firebrick", "darkblue", "slateblue1", "slategray3", "springgreen3")
-
 metab_df["sample_time"] <- sample_names
 
 metab_df$sample_time <- as.factor(metab_df$sample_time)
 
 divXmet.cca <- cca(a_div_df ~ Biogas + Butirico + Isovalerico + Acetico + Isobutirico + Valerico + Propionico, data=metab_df)
 
-plot(divXmet.cca, scaling = 1, type = "none")
-text(divXmet.cca, "bp", col="blue", cex=1, scaling = 1)
-points(divXmet.cca, "sites", pch=1, col = colvec[metab_df$sample_time], bg="yellow", cex=0.8, scaling = 1)
-points(divXmet.cca, "species", pch=21, col="green", bg="yellow", cex=1, scaling = 1)
-text(divXmet.cca, "species", col="red", cex=0.8, scaling = 1)
-legend("topright", legend = levels(metab_df$sample_time), bty = "n",col = colvec, pch = 21, pt.bg = colvec)
+colvec <- c("turquoise2", "snow4", "mediumblue", "maroon2", "aquamarine4", "tan3", "darkblue", "slateblue1", "lightpink3", "springgreen4")
 
+plot(divXmet.cca, scaling = 1, type = "none")
+text(divXmet.cca, "bp", col="goldenrod1", cex=1, scaling = 1)
+points(divXmet.cca, "sites", pch=2, col = colvec[metab_df$sample_time], bg=colvec[metab_df$sample_time], cex=0.8, scaling = 1)
+points(divXmet.cca, "species", pch=21, col="firebrick3", bg="firebrick3", cex=1, scaling = 1)
+text(divXmet.cca, "species", col="forestgreen", cex=0.7, scaling = 1)
+legend("bottomleft", legend = levels(metab_df$sample_time), bty = "n",col = colvec, pch = 21, pt.bg = colvec)
+
+summary(divXmet.cca)
 anova(divXmet.cca, perm=1000)
 anova(divXmet.cca, by = "axis", perm=1000)
 anova(divXmet.cca, by = "term", perm=1000)

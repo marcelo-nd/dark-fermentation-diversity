@@ -9,7 +9,7 @@ source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 # Rarefaction curves
 ####################################################################################
 #Reading OTU table
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction2/11_table.from_biom_w_taxonomy.txt")
 
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
 
@@ -26,7 +26,7 @@ rarecurve(alta_diversidad_t, step = 1, sample = raremax,label = FALSE)
 # T-0 Analyses
 ####################################################################################
 #Reading OTU table
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction2/11_table.from_biom_w_taxonomy.txt")
 
 # Selecting only "alta diversidad"
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
@@ -105,7 +105,7 @@ heatmap(bdist, scale = "none")
 # Time series analyses
 ####################################################################################
 #Reading OTU table
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction2/11_table.from_biom_w_taxonomy.txt")
 
 # Selecting only "alta diversidad"
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
@@ -116,7 +116,7 @@ otu_table_f <- filter_otus_by_counts_col_percent(alta_diversidad, min_count = 20
 times <- c("A.0.", "A.4.", "A.7.", "A.11.", "A.14.", "A.21.", "A.23.", "A.27.", "A.47.", "A.60.")
 
 # Getting the means of each OTU.
-time_mean_diversity <- data.frame()[1:22, ] # Empty dataframe
+time_mean_diversity <- data.frame()[1:24, ] # Empty dataframe
 row.names(time_mean_diversity) <- row.names(otu_table_f)
 for (iter_time in times) {
   current_values <- select(otu_table_f, starts_with(iter_time))
@@ -140,7 +140,7 @@ time_div_g$time <- factor(time_div_g$time, levels = c("A.0.", "A.4.", "A.7.", "A
 ggplot(time_div_g, aes(x=time, y=counts, fill=bacteria)) + 
   geom_bar(position="stack", stat="identity")
 
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "brown1", "#CC79A7", "olivedrab3", "rosybrown", "darkorange3", "blueviolet", "darkolivegreen4", "lightskyblue4", "navajowhite4", "purple4", "springgreen4", "firebrick3", "gold3", "cyan3", "plum", "mediumspringgreen")
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "brown1", "#CC79A7", "olivedrab3", "rosybrown", "darkorange3", "blueviolet", "darkolivegreen4", "lightskyblue4", "navajowhite4", "purple4", "springgreen4", "firebrick3", "gold3", "cyan3", "plum", "mediumspringgreen", "blue", "red")
 
 ggplot(time_div_g, aes(x=time, y=counts, fill=bacteria)) +
   geom_bar(position="fill", stat="identity") +
@@ -196,7 +196,7 @@ ggplot(time_div_g, aes(x=time, y=counts, fill=bacteria)) +
 # Species correlation heatmap
 ####################################################################################
 #Reading OTU table
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction2/11_table.from_biom_w_taxonomy.txt")
 
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
 
@@ -227,7 +227,7 @@ corrplot(otuXotu, p.mat = testRes$p, method = 'color', diag = FALSE, type = 'upp
 library(cooccur)
 
 #Reading OTU table
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction2/11_table.from_biom_w_taxonomy.txt")
 
 # Selecting only "alta diversidad"
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
@@ -272,4 +272,4 @@ visNetwork(nodes = nodes, edges = edges) %>%
 ####################################################################################
 
 #Export Data
-write.csv(otu_table, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_rare.csv")
+write.csv(otu_table, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_raref2.csv")

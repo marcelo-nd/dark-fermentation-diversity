@@ -8,7 +8,7 @@ source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
 # Biogas
 ####################################################################################
-# Exploración de datos de producción de biogás.
+# Biogas data exploration.
 
 biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
 colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
@@ -31,18 +31,17 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
   #geom_vline(xintercept = c(0, 27, 60), color = "#74AA50", alpha = 0.2 , size = 2) +
   #geom_vline(xintercept = c(0, 1, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 26, 27, 47, 53, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
   geom_vline(xintercept = c(0, 4, 7, 11, 14, 21, 23, 27, 47, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
-  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=7, angle = 45),
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=12, angle = 90),
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
 
-#theme(axis.text.x = element_text(angle = 60, vjust = 0.5, hjust=1))
 ####################################################################################
 # AGVs
 ####################################################################################
-# Exploración de datos de producción de ácidos grasos volatiles. 12 réplicas.
+# Exploraciï¿½n de datos de producciï¿½n de ï¿½cidos grasos volatiles. 12 rï¿½plicas.
 
-# Cargando datos crudos de AGVs. Este DF tiene subréplicas de medición para cada reactor réplica.
-# También contiene mediciones réplica del estándard usado y que ayudará a calcular la concentración en PPM.
-# Esta tabla es sólo para el tiempo 0.
+# Cargando datos crudos de AGVs. Este DF tiene subrï¿½plicas de mediciï¿½n para cada reactor rï¿½plica.
+# Tambiï¿½n contiene mediciones rï¿½plica del estï¿½ndard usado y que ayudarï¿½ a calcular la concentraciï¿½n en PPM.
+# Esta tabla es sï¿½lo para el tiempo 0.
 agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A6:AA12")
 
 std_values <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A130:B136")
@@ -76,20 +75,61 @@ ggplot(data = agvs_by_cases, aes(factor(tiempo), agv_ppm)) +
   geom_boxplot(aes(fill = Compuesto), alpha = 0.5, outlier.shape=NA) +
   geom_point(aes(colour = Compuesto), alpha = 1, position = position_jitterdodge(jitter.width = 0, dodge.width = 0.75)) +
   ylim(0, 1200) +
-  xlab("Tiempo (días)") +
-  ylab("Concentración AGV's (PPM)") +
-  ggtitle("Concentración AGV's (PPM); 12 réplicas") +
+  xlab("Tiempo (dï¿½as)") +
+  ylab("Concentraciï¿½n AGV's (PPM)") +
+  ggtitle("Concentraciï¿½n AGV's (PPM); 12 rï¿½plicas") +
   theme_few() +
   theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=13),
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13)) +
   labs(colour = "AGV's", fill = "AGV's")
 ####################################################################################
+
+# Biogas con invasion
+####################################################################################
+# Biogas data exploration.
+
+biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
+colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+biogas <- select(biogas, "tiempo", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+
+biogas_by_cases <- gather(biogas, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                          key = "replicate", value = "biogas_ml")
+
+biogas_invasion <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "biogas_invasion", range = "A13:N22")
+biogas_invasion <- select(biogas_invasion, "tiempo", ends_with("i"))[2:9,]
+head(biogas_invasion)
+biogas_inv_by_cases <- gather(biogas_invasion, "1_1i", "1_3i", "1_4i", "1_5i", "1_6i", "1_8i",
+                          key = "replicate", value = "biogas_ml")
+
+biogas_by_cases <- rbind(biogas_by_cases, biogas_inv_by_cases)
+
+
+ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
+  geom_boxplot(aes(group = cut_width(tiempo, 1)), outlier.color = "#BE3A34", alpha = 1) +
+  geom_point(size = 1, alpha = 0.2) +
+  #scale_x_continuous(breaks = c(biogas$tiempo, biogas_invasion$tiempo)) +
+  scale_x_continuous(breaks = c(0, 4, 7, 11, 14, 20, 21, 23, 27, 40, 47, 60, 61, 68)) +
+  ylim(0, 1200) +
+  xlab("Time (days)") +
+  ylab("Production (biogas mL/L)") +
+  ggtitle("Biogas produced (n = 12)") +
+  theme_few() +
+  geom_vline(xintercept = c(60), color = "firebrick", alpha = 0.2 , size = 2) +
+  #geom_vline(xintercept = c(0, 27, 60), color = "#74AA50", alpha = 0.2 , size = 2) +
+  #geom_vline(xintercept = c(0, 1, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 26, 27, 47, 53, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  geom_vline(xintercept = c(0, 4, 7, 11, 14, 21, 23, 27, 47, 60, 61, 68), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=12, angle = 45),
+        axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
+
+
+####################################################################################
+
 # Export data
 ####################################################################################
 # Transforming data and exporting to make it usable in other analyses.
 # Preparing AGVs data.
 
-# Se añade el nombre de las muestras correctamente
+# Se aï¿½ade el nombre de las muestras correctamente
 agvs_by_cases["exp"] <- "A"
 agvs_by_cases <- unite(agvs_by_cases, exp, tiempo, replicate, col = "sample", sep = ".")
 # We separate the DF, with samples as key and preserving agv concentration value

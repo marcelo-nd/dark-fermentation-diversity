@@ -71,7 +71,6 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
 
 ####################################################################################
 
-
 # AGVs
 ####################################################################################
 agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "agvs_areas", range = "A6:AA12")
@@ -116,6 +115,88 @@ ggplot(data = agvs_by_cases, aes(factor(tiempo), agv_ppm)) +
   theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=13),
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13)) +
   labs(colour = "AGV's", fill = "AGV's")
+####################################################################################
+
+# AGVs (includes invasion experiment concentration data data)
+####################################################################################
+# Exploraciï¿½n de datos de producciï¿½n de ï¿½cidos grasos volatiles. 12 rï¿½plicas.
+
+# Cargando datos crudos de AGVs. Este DF tiene subrï¿½plicas de mediciï¿½n para cada reactor rï¿½plica.
+# Tambiï¿½n contiene mediciones rï¿½plica del estï¿½ndard usado y que ayudarï¿½ a calcular la concentraciï¿½n en PPM.
+# Esta tabla es sï¿½lo para el tiempo 0.
+agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "agvs_areas", range = "A6:AA12")
+
+std_values <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A126:B132")
+
+agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = 0, replicates = 12, subreplicates = 2, standard = TRUE)
+
+agv_ppm_per_day <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+
+days <- c(2, 4, 7, 11, 14, 18, 23, 25, 27)
+day_counter <- 1
+
+for(file_upper_row in seq(16, 96, by = 10)){
+  file_lower_row <- file_upper_row + 6
+  file_range <- paste("A", toString(file_upper_row), ":AA", toString(file_lower_row), sep="")
+  agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "agvs_areas", range = file_range)
+  agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = days[day_counter], replicates = 12, subreplicates = 2, standard = TRUE)
+  agv_ppm <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+  agv_ppm_per_day <- rbind(agv_ppm_per_day, agv_ppm)
+  day_counter <- day_counter + 1
+}
+
+colnames(agv_ppm_per_day) <- c("Compuesto", "tiempo", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+
+head(agv_ppm_per_day)
+
+agvs_by_cases <- gather(agv_ppm_per_day, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                        key = "replicate", value = "agv_ppm")
+head(agvs_by_cases)
+
+# Read invasion experiment AGVs concentration data
+agvs_areas_inv <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "agvs_areas", range = "A106:AA112")
+
+agv_means_inv <- get_replicate_means(replicate_data = agvs_areas_inv, id_col_name = "tiempo", id = 28, replicates = 12, subreplicates = 2, standard = TRUE)
+
+agv_ppm_per_day_inv <- get_qnty_from__std(agv_means_inv, id_col = 2, replicates = 12, std_values = std_values)
+
+days <- c(35)
+day_counter <- 1
+
+for(file_upper_row in seq(116, 125, by = 10)){
+  file_lower_row <- file_upper_row + 6
+  file_range <- paste("A", toString(file_upper_row), ":AA", toString(file_lower_row), sep="")
+  agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "agvs_areas", range = file_range)
+  agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = days[day_counter], replicates = 12, subreplicates = 2, standard = TRUE)
+  agv_ppm <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+  agv_ppm_per_day_inv <- rbind(agv_ppm_per_day_inv, agv_ppm)
+  day_counter <- day_counter + 1
+}
+
+agv_ppm_per_day_inv <- select(agv_ppm_per_day_inv, "Compuesto", "tiempo", "R2_", "R4_","R6_", "R8_", "R10", "R12")
+
+colnames(agv_ppm_per_day_inv) <- c("Compuesto", "tiempo", "2", "4", "6", "8", "10", "12")
+
+agvs_by_cases_inv <- gather(agv_ppm_per_day_inv, "2", "4", "6", "8", "10", "12",
+                            key = "replicate", value = "agv_ppm")
+head(agvs_by_cases_inv)
+# Joining initial experiment with invasion experiment data
+
+agvs_by_cases <- rbind(agvs_by_cases, agvs_by_cases_inv)
+
+
+ggplot(data = agvs_by_cases, aes(factor(tiempo), agv_ppm)) +
+  geom_boxplot(aes(fill = Compuesto), alpha = 0.5, outlier.shape=NA) +
+  geom_point(aes(colour = Compuesto), alpha = 1, position = position_jitterdodge(jitter.width = 0, dodge.width = 0.75)) +
+  ylim(0, 1200) +
+  xlab("Time (days)") +
+  ylab("VFAs Concentration(PPM)") +
+  ggtitle("VFAs Concentration(PPM); 12 replicates") +
+  geom_vline(xintercept = c(10), color = "firebrick", alpha = 0.2 , size = 2) +
+  theme_few() +
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=13),
+        axis.title.y = element_text(size=18), axis.text.y = element_text(size=13)) +
+  labs(colour = "VFAs", fill = "VFAs")
 ####################################################################################
 
 # Export metabolite data
@@ -197,7 +278,7 @@ plot(hclust(as.dist(jdist), method="ward.D"))
 # Diversity-Time series
 ####################################################################################
 
-otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/resultados_h2diversidad_std/Rarefaction/11_table.from_biom_w_taxonomy.txt")
+otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table.csv", row.names = 1)
 
 # Selecting only "alta diversidad"
 baja_diversidad <- select(otu_table, starts_with("B.0"), starts_with("B.4"), starts_with("B.7"), starts_with("B.1"), starts_with("B.2"), starts_with("B.6"))
@@ -232,7 +313,7 @@ time_div_g$time <- factor(time_div_g$time, levels = c("B.0.", "B.2.", "B.4.", "B
 ggplot(time_div_g, aes(x=time, y=counts, fill=bacteria)) + 
   geom_bar(position="stack", stat="identity")
 
-cbbPalette <- c("darkolivegreen3", "lightskyblue4")
+cbbPalette <- c("#0072B2", "darkorange3")
 
 ggplot(time_div_g, aes(x=time, y=counts, fill=bacteria)) +
   geom_bar(position="fill", stat="identity") +
@@ -251,19 +332,19 @@ library("Hmisc")
 
 source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
-otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_rare.csv", row.names = 1)
+otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table.csv", row.names = 1)
 
 metabolite_data <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/metabolite_data_baja.csv", row.names = 1)
 
 baja_diversidad <- select(otu_table, starts_with("B.0"), starts_with("B.2"), starts_with("B.4"), starts_with("B.7"), starts_with("B.1"))
 baja_diversidad <- filter_otus_by_counts_col_percent(baja_diversidad, min_count = 20, percentage = 0.20)
 
-write.csv(baja_diversidad, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/baja_diversidad_20_rare.csv", row.names =  TRUE)
+write.csv(baja_diversidad, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/baja_diversidad_otu_table.csv", row.names =  TRUE)
 
 # Correlation Heatmap (with significance)
 
 # Transforming data to matrices
-b_div_mat <- t(baja_diversidad)
+b_div_mat <- t(baja_table_f)
 b_div_mat <- b_div_mat[order(row.names(b_div_mat)), ] # Ordering by row names
 
 metab_mat <- t(metabolite_data)
@@ -309,7 +390,7 @@ library("tidyr")
 library("ggplot2")
 source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
-otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_raref2.csv", row.names = 1)
+otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table.csv", row.names = 1)
 invasion_baja <- select(otu_table, starts_with("B.i"))
 invasion_baja <- filter_otus_by_counts_col_percent(invasion_baja, min_count = 20, percentage = 0.20)
 # Ordering by col names
@@ -330,9 +411,11 @@ invasion_antes_g <- gather(invasion_antes, spcs_names, key = "time", value = "co
 
 invasion_antes_g$time <- factor(invasion_antes_g$time, levels = colnames(invasion_baja))
 
+cbbPalette <- c("#0072B2", "darkorange3","lightskyblue4")
+
 ggplot(invasion_antes_g, aes(x=time, y=counts, fill=bacteria)) + 
   geom_bar(position="fill", stat="identity") +
-  theme(axis.text.x = element_text(angle = 60, vjust = 0.5, hjust=1))
+  scale_fill_manual(values=cbbPalette)
 
 # Muestras después de la invasión
 
@@ -346,9 +429,11 @@ invasion_despues_g <- gather(invasion_despues, spcs_names_d, key = "time", value
 
 invasion_despues_g$time <- factor(invasion_despues_g$time, levels = colnames(invasion_baja))
 
+cbbPalette <- c("#0072B2", "darkorange3","lightskyblue4")
+
 ggplot(invasion_despues_g, aes(x=time, y=counts, fill=bacteria)) + 
   geom_bar(position="fill", stat="identity") +
-  theme(axis.text.x = element_text(angle = 60, vjust = 0.5, hjust=1))
+  scale_fill_manual(values=cbbPalette)
 
 
 ####################################################################################

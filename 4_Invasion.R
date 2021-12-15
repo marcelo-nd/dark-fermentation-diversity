@@ -6,7 +6,7 @@ source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 # Read Data
 ####################################################################################
 
-otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_raref2.csv", row.names = 1)
+otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table.csv", row.names = 1)
 
 invasion_diversidad <- select(otu_table, starts_with("A.i"))
 invasion_diversidad <- filter_otus_by_counts_col_percent(invasion_diversidad, min_count = 20, percentage = 0.20)

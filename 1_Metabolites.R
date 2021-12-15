@@ -35,6 +35,7 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
 
 ####################################################################################
+
 # AGVs
 ####################################################################################
 # Exploraci�n de datos de producci�n de �cidos grasos volatiles. 12 r�plicas.
@@ -44,7 +45,7 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
 # Esta tabla es s�lo para el tiempo 0.
 agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A6:AA12")
 
-std_values <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A130:B136")
+std_values <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A126:B132")
 
 agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = 0, replicates = 12, subreplicates = 2, standard = TRUE)
 
@@ -122,6 +123,89 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
 
 
+####################################################################################
+
+# AGVs (includes invasion experiment concentration data data)
+####################################################################################
+# Exploraci�n de datos de producci�n de �cidos grasos volatiles. 12 r�plicas.
+
+# Cargando datos crudos de AGVs. Este DF tiene subr�plicas de medici�n para cada reactor r�plica.
+# Tambi�n contiene mediciones r�plica del est�ndard usado y que ayudar� a calcular la concentraci�n en PPM.
+# Esta tabla es s�lo para el tiempo 0.
+agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A6:AA12")
+
+std_values <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A126:B132")
+
+agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = 0, replicates = 12, subreplicates = 2, standard = TRUE)
+
+agv_ppm_per_day <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+
+days <- c(4, 7 , 11, 14, 21, 23, 27, 47, 60)
+day_counter <- 1
+
+for(file_upper_row in seq(16, 96, by = 10)){
+  file_lower_row <- file_upper_row + 6
+  file_range <- paste("A", toString(file_upper_row), ":AA", toString(file_lower_row), sep="")
+  agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = file_range)
+  agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = days[day_counter], replicates = 12, subreplicates = 2, standard = TRUE)
+  agv_ppm <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+  agv_ppm_per_day <- rbind(agv_ppm_per_day, agv_ppm)
+  day_counter <- day_counter + 1
+}
+
+colnames(agv_ppm_per_day) <- c("Compuesto", "tiempo", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+
+head(agv_ppm_per_day)
+
+agvs_by_cases <- gather(agv_ppm_per_day, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                        key = "replicate", value = "agv_ppm")
+head(agvs_by_cases)
+
+# Read invasion experiment AGVs concentration data
+agvs_areas_inv <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = "A106:AA112")
+
+agv_means_inv <- get_replicate_means(replicate_data = agvs_areas_inv, id_col_name = "tiempo", id = 61, replicates = 12, subreplicates = 2, standard = TRUE)
+
+agv_ppm_per_day_inv <- get_qnty_from__std(agv_means_inv, id_col = 2, replicates = 12, std_values = std_values)
+
+days <- c(68)
+day_counter <- 1
+
+for(file_upper_row in seq(116, 125, by = 10)){
+  file_lower_row <- file_upper_row + 6
+  file_range <- paste("A", toString(file_upper_row), ":AA", toString(file_lower_row), sep="")
+  agvs_areas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "agvs_areas", range = file_range)
+  agv_means <- get_replicate_means(replicate_data = agvs_areas, id_col_name = "tiempo", id = days[day_counter], replicates = 12, subreplicates = 2, standard = TRUE)
+  agv_ppm <- get_qnty_from__std(agv_means, id_col = 2, replicates = 12, std_values = std_values)
+  agv_ppm_per_day_inv <- rbind(agv_ppm_per_day_inv, agv_ppm)
+  day_counter <- day_counter + 1
+}
+
+agv_ppm_per_day_inv <- select(agv_ppm_per_day_inv, "Compuesto", "tiempo", "R2_", "R4_","R6_", "R8_", "R10", "R12")
+
+colnames(agv_ppm_per_day_inv) <- c("Compuesto", "tiempo", "2", "4", "6", "8", "10", "12")
+
+agvs_by_cases_inv <- gather(agv_ppm_per_day_inv, "2", "4", "6", "8", "10", "12",
+                        key = "replicate", value = "agv_ppm")
+head(agvs_by_cases_inv)
+# Joining initial experiment with invasion experiment data
+
+
+agvs_by_cases <- rbind(agvs_by_cases, agvs_by_cases_inv)
+
+
+ggplot(data = agvs_by_cases, aes(factor(tiempo), agv_ppm)) +
+  geom_boxplot(aes(fill = Compuesto), alpha = 0.5, outlier.shape=NA) +
+  geom_point(aes(colour = Compuesto), alpha = 1, position = position_jitterdodge(jitter.width = 0, dodge.width = 0.75)) +
+  ylim(0, 1200) +
+  xlab("Time (days)") +
+  ylab("VFAs Concentration(PPM)") +
+  ggtitle("VFAs Concentration(PPM); 12 replicates") +
+  geom_vline(xintercept = c(10), color = "firebrick", alpha = 0.2 , size = 2) +
+  theme_few() +
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=13),
+        axis.title.y = element_text(size=18), axis.text.y = element_text(size=13)) +
+  labs(colour = "VFAs", fill = "VFAs")
 ####################################################################################
 
 # Export data

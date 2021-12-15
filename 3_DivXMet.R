@@ -7,15 +7,10 @@ source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
 
 # Read Data
 ####################################################################################
-otu_table <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/otu_table_raref2.csv", row.names = 1)
+alta_diversidad <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/altad_otu_table.csv", row.names = 1)
 
 metabolite_data <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/metabolite_data.csv", row.names = 1)
 
-
-alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
-alta_diversidad <- filter_otus_by_counts_col_percent(alta_diversidad, min_count = 20, percentage = 0.20)
-
-write.csv(alta_diversidad, "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/alta_diversidad_20_raref2.csv", row.names =  TRUE)
 ####################################################################################
 
 # Correlation Heatmap
@@ -56,7 +51,7 @@ colnames(adXm)[1] <- "species"
 adXm_g <- gather(adXm, "Acetico", "Butirico", "Isobutirico", "Isovalerico", "Propionico", "Valerico", "Biogas", key = "compound", value = "correlation")
 
 # Getting significance data
-adxm.pval <- as.data.frame(rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 25:31][1:24,])
+adxm.pval <- as.data.frame(rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 21:27][1:20,])
 # Converting rownames to column 1
 adxm.pval <- cbind(rownames(adxm.pval), data.frame(adxm.pval, row.names=NULL))
 colnames(adxm.pval)[1] <- "species"
@@ -104,7 +99,7 @@ anova(divXmet.cca, by = "term", perm=1000)
 
 ####################################################################################
 
-# CCA 2
+# CCA (color coded)
 ####################################################################################
 a_div_mat <- t(alta_diversidad)
 a_div_mat <- a_div_mat[order(row.names(a_div_mat)), ] # Ordering by row names

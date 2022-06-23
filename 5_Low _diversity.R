@@ -4,13 +4,13 @@ library("ggplot2")
 library("ggthemes")
 library("dplyr")
 
-source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
+source("C:/Users/marce/Documents/Repos/microbiome-help/microbiome_helper_functions.R")
 
 # Metabolites
 ####################################################################################
 # Biogas
 ####################################################################################
-biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/baja_diversidad.xlsx", sheet = "biogas", range = "A36:O64")
+biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/0_datos/baja_diversidad.xlsx", sheet = "biogas", range = "A36:O64")
 colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
 
 head(biogas)
@@ -33,6 +33,32 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
 
 ####################################################################################
+
+# Biogas stability
+
+# Stability of each replicate
+
+replicate_data_biogas <- biogas[,4:15]
+
+replicate_data_biogas
+
+means <- sapply(replicate_data_biogas, mean)
+std_dev <- sapply(replicate_data_biogas, sd)
+
+stability <- std_dev/means
+
+replicate_data_biogas[0:0,1:ncol(replicate_data_biogas)]
+data.frame(means, std_dev, stability, row.names = colnames(replicate_data_biogas))
+
+# stability each 3 days
+
+replicate_stability <- stability_per_period(replicate_data = replicate_data_biogas, period = 3)
+
+means2 <- sapply(replicate_stability, mean)
+
+plot(means2)
+
+means2
 
 # Biogas invasion
 ####################################################################################

@@ -34,31 +34,39 @@ ggplot(biogas_by_cases, aes(tiempo, biogas_ml)) +
   theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=12, angle = 90),
         axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))
 
-# Biogas stability
+# Biogas stability index
 
-# Stability of each replicate
+# Stability of each replicate during whole experiment.
 
+# Subsetting only biogas production data
 replicate_data_biogas <- biogas[,4:15]
 
 replicate_data_biogas
 
+# Calculating HPSI for each replicate
 means <- sapply(replicate_data_biogas, mean)
 std_dev <- sapply(replicate_data_biogas, sd)
+stability <- 1-(std_dev/means)
 
-stability <- std_dev/means
+stability
 
-replicate_data_biogas[0:0,1:ncol(replicate_data_biogas)]
 data.frame(means, std_dev, stability, row.names = colnames(replicate_data_biogas))
 
-# stability each 3 days
+# Stability of the whole treatment
+mean(stability)
 
-replicate_stability <- stability_per_period(replicate_data = replicate_data_biogas, period = 3)
+# Calculating HPSI for 3 consecutive days beginning from day 3
 
-means2 <- sapply(replicate_stability, mean)
+replicate_stability <- stability_per_period(replicate_data = replicate_data_biogas, period_length = 3)
 
-means2
+replicate_stability
 
-plot(means2)
+# Calculating the mean 3-consecutive-days stability for each replicate.
+means_si_3days <- sapply(replicate_stability, mean)
+
+means_si_3days
+
+plot(means_si_3days)
 
 
 ####################################################################################
@@ -123,7 +131,7 @@ biogas <- select(biogas, "tiempo", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
 biogas_by_cases <- gather(biogas, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                           key = "replicate", value = "biogas_ml")
 
-biogas_invasion <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "biogas_invasion", range = "A13:N22")
+biogas_invasion <- read_xlsx(path = "C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/0_datos/alta_diversidad.xlsx", sheet = "biogas_invasion", range = "A13:N22")
 biogas_invasion <- select(biogas_invasion, "tiempo", ends_with("i"))[2:9,]
 head(biogas_invasion)
 biogas_inv_by_cases <- gather(biogas_invasion, "1_1i", "1_3i", "1_4i", "1_5i", "1_6i", "1_8i",

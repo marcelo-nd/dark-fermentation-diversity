@@ -3,13 +3,14 @@ library("corrplot")
 library("vegan")
 library("tidyr")
 
-source("C:/Users/marce/Desktop/microbiome-help/microbiome_helper_functions.R")
+source("C:/Users/marce/Documents/Repos/microbiome-help/diversity_data_helper_functions.R")
+source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_functions.R")
 
 # Read Data
 ####################################################################################
-alta_diversidad <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/altad_otu_table.csv", row.names = 1)
+alta_diversidad <- read.csv("C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/altad_otu_table.csv", row.names = 1)
 
-metabolite_data <- read.csv("C:/Users/marce/OneDrive/DiversidadH2/2_resultados/metabolite_data.csv", row.names = 1)
+metabolite_data <- read.csv("C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/metabolite_data.csv", row.names = 1)
 
 ####################################################################################
 
@@ -129,7 +130,7 @@ colvec <- c("firebrick3", "#cb3040", "#c6235a", "#b92573", "#a33189", "#853e9a",
 
 plot(divXmet.cca, scaling = 1, type = "none")
 text(divXmet.cca, "bp", col="goldenrod1", cex=1, scaling = 1)
-points(divXmet.cca, "sites", pch=1, col = colvec[metab_df$sample_time], bg=colvec[metab_df$sample_time], cex=0.5, scaling = 1)
+points(divXmet.cca, "sites", pch=21, col = colvec[metab_df$sample_time], bg=colvec[metab_df$sample_time], cex=1, scaling = 1)
 points(divXmet.cca, "species", pch=21, col="forestgreen", bg="forestgreen", cex=1, scaling = 1)
 text(divXmet.cca, "species", col="forestgreen", cex=0.7, scaling = 1)
 legend("bottomleft", legend = levels(metab_df$sample_time), bty = "n",col = colvec, pch = 21, pt.bg = colvec)

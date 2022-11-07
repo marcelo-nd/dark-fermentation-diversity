@@ -4,7 +4,7 @@ library("ggplot2")
 library("ggthemes")
 library("dplyr")
 
-source("C:/Users/marce/Documents/Repos/microbiome-help/microbiome_helper_functions.R")
+source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_functions.R")
 
 # Biogas
 ####################################################################################

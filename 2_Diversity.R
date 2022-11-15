@@ -10,7 +10,7 @@ source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_fu
 # Reading data
 ####################################################################################
 # Reading otu table from dada2 output. Aggregated by species level.
-biom_file <- "C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/diversidad_h2_dada/9_table_w_tax.biom"
+biom_file <- "C:/Users/marce/OneDrive/Sci/Doctorado/DiversidadH2/Análisis/2_resultados/diversidad_h2_dada/9_table_w_tax.biom"
 otu_table <- get_otu_table_dada(biom_file = biom_file, starting_col = 16, level = "Species")
 
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))

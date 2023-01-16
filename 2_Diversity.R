@@ -4,14 +4,17 @@ library("vegan")
 library("ggplot2")
 
 
-source("C:/Users/marce/Documents/Repos/microbiome-help/diversity_data_helper_functions.R")
-source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_functions.R")
+source("C:/Users/Marcelo/Documents/Github/microbiome-help/diversity_data_helper_functions.R")
+source("C:/Users/Marcelo/Documents/Github/microbiome-help/functional_data_helper_functions.R")
+source("C:/Users/Marcelo/Documents/Github/microbiome-help/table_importers.R")
+
 
 # Reading data
 ####################################################################################
 # Reading otu table from dada2 output. Aggregated by species level.
-biom_file <- "C:/Users/marce/OneDrive/Sci/Doctorado/DiversidadH2/Análisis/2_resultados/diversidad_h2_dada/9_table_w_tax.biom"
-otu_table <- get_otu_table_dada(biom_file = biom_file, starting_col = 16, level = "Species")
+biom_path <- "C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/2_resultados/diversidad_h2_dada/9_table_w_tax.biom"
+
+otu_table <- load_biom_as_table(biom_path = biom_path, tax_rank = "Species", strain_taxonomy = FALSE, order_table = TRUE)
 
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))
 
@@ -56,7 +59,7 @@ corrplot::corrplot.mixed(jdist, order = 'hclust', addrect = 2)
 heatmap(jdist, scale = "none")
 
 # Bray-Curtis index is based on abundance data, while the Sorensen index is based on presence/absence data
-bdist <- as.matrix(vegan::vegdist(x = t(time_zero_f), method="bray"))
+bdist <- as.matrix(vegan::vegdist(x = t(time_zero), method="bray"))
 corrplot::corrplot(bdist, order = 'hclust', addrect = 2)
 corrplot::corrplot.mixed(bdist, order = 'hclust', addrect = 2)
 heatmap(bdist, scale = "none")
@@ -71,7 +74,7 @@ plot(hclust(as.dist(jdist), method="ward.D"))
 # T-60 Analyses
 ####################################################################################
 #Reading OTU table
-#otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/resultados_h2/diversidad_std/11_table.from_biom_w_taxonomy.txt")
+#otu_table <- read_qiime_otu_table("C:/Users/marce/OneDrive/Sci/DiversidadH2/An?lisis/2_resultados/resultados_h2/diversidad_std/11_table.from_biom_w_taxonomy.txt")
 
 # Selecting only "alta diversidad"
 alta_diversidad <- select(otu_table, starts_with("A.0"), starts_with("A.4"), starts_with("A.7"), starts_with("A.1"), starts_with("A.2"), starts_with("A.6"))

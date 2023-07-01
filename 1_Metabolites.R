@@ -4,13 +4,13 @@ library("ggplot2")
 library("ggthemes")
 library("dplyr")
 
-source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_functions.R")
+source("C:/Users/Marcelo/Documents/GitHub/microbiome-help/functional_data_helper_functions.R")
 
 # Biogas
 ####################################################################################
 # Biogas data exploration.
 
-biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
+biogas <- read_xlsx(path = "C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
 colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
 
 head(biogas)
@@ -124,16 +124,23 @@ ggplot(data = agvs_by_cases, aes(factor(tiempo), agv_ppm)) +
 ####################################################################################
 # Biogas data exploration.
 
-biogas <- read_xlsx(path = "C:/Users/marce/OneDrive/DiversidadH2/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
+biogas <- read_xlsx(path = "C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
+
 colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+
+head(biogas)
+
 biogas <- select(biogas, "tiempo", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
 
 biogas_by_cases <- gather(biogas, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                           key = "replicate", value = "biogas_ml")
 
-biogas_invasion <- read_xlsx(path = "C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/0_datos/alta_diversidad.xlsx", sheet = "biogas_invasion", range = "A13:N22")
+biogas_invasion <- read_xlsx(path = "C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/0_datos/alta_diversidad.xlsx", sheet = "biogas_invasion", range = "A13:N22")
+
 biogas_invasion <- select(biogas_invasion, "tiempo", ends_with("i"))[2:9,]
-head(biogas_invasion)
+
+head( biogas_invasion)
+
 biogas_inv_by_cases <- gather(biogas_invasion, "1_1i", "1_3i", "1_4i", "1_5i", "1_6i", "1_8i",
                           key = "replicate", value = "biogas_ml")
 
@@ -282,3 +289,30 @@ metabolite_data <- rbind(agvs_by_samples, biogas_by_samples)
 metabolite_data
 
 write.csv(x = metabolite_data, file = "C:/Users/marce/OneDrive/DiversidadH2/2_resultados/metabolite_data.csv", row.names = FALSE)
+
+############ Biogas, invasion without collapsed bioreactor
+
+# Remove collapsed biorreactor if necessary
+biogas_invasion_nc <- select(biogas_invasion, -"1_3i")
+
+biogas_inv_by_cases_nc <- gather(biogas_invasion_nc, "1_1i", "1_4i", "1_5i", "1_6i", "1_8i",
+                              key = "replicate", value = "biogas_ml")
+
+biogas_inv_by_cases_nc <- rbind(dplyr::filter(biogas_by_cases, tiempo == 60), biogas_inv_by_cases_nc)
+
+ggplot(biogas_inv_by_cases_nc, aes(tiempo, biogas_ml)) +
+  geom_boxplot(aes(group = cut_width(tiempo, 1)), outlier.color = "#BE3A34", alpha = 1) +
+  geom_point(size = 1, alpha = 0.2) +
+  #scale_x_continuous(breaks = c(biogas$tiempo, biogas_invasion$tiempo)) +
+  scale_x_continuous(breaks = c(60, 61, 68)) +
+  ylim(0, 1200) +
+  xlab("Time (days)") +
+  ylab("Production (biogas mL/L)") +
+  ggtitle("Biogas produced (n = 12)") +
+  theme_few() +
+  geom_vline(xintercept = c(60), color = "firebrick", alpha = 0.2 , size = 2) +
+  #geom_vline(xintercept = c(0, 27, 60), color = "#74AA50", alpha = 0.2 , size = 2) +
+  #geom_vline(xintercept = c(0, 1, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 26, 27, 47, 53, 60), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  geom_vline(xintercept = c(60, 61, 68), linetype = "dotted", color = "#00B8DE", alpha = 0.8 , size = 1) +
+  theme(axis.title.x =  element_text(size=18), axis.text.x = element_text(size=12, angle = 45),
+        axis.title.y = element_text(size=18), axis.text.y = element_text(size=13))

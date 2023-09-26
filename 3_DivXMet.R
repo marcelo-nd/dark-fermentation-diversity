@@ -3,14 +3,15 @@ library("corrplot")
 library("vegan")
 library("tidyr")
 
-source("C:/Users/marce/Documents/Repos/microbiome-help/diversity_data_helper_functions.R")
-source("C:/Users/marce/Documents/Repos/microbiome-help/functional_data_helper_functions.R")
+source("C:/Users/Marcelo/Documents/Github/microbiome-help/diversity_data_helper_functions.R")
 
-# Read Data
+source("C:/Users/Marcelo/Documents/Github/microbiome-help/functional_data_helper_functions.R")
+
+# Load Data
 ####################################################################################
-alta_diversidad <- read.csv("C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/altad_otu_table.csv", row.names = 1)
+alta_diversidad <- read.csv("C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/2_resultados/altad_otu_table.csv", row.names = 1)
 
-metabolite_data <- read.csv("C:/Users/marce/OneDrive/Sci/DiversidadH2/Análisis/2_resultados/metabolite_data.csv", row.names = 1)
+metabolite_data <- read.csv("C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/AnÃ¡lisis/2_resultados/metabolite_data.csv", row.names = 1)
 
 ####################################################################################
 
@@ -52,7 +53,7 @@ colnames(adXm)[1] <- "species"
 adXm_g <- gather(adXm, "Acetico", "Butirico", "Isobutirico", "Isovalerico", "Propionico", "Valerico", "Biogas", key = "compound", value = "correlation")
 
 # Getting significance data
-adxm.pval <- as.data.frame(rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 21:27][1:20,])
+adxm.pval <- as.data.frame(Hmisc::rcorr(a_div_mat, metab_mat, type = "pearson")$P[, 21:27][1:20,])
 # Converting rownames to column 1
 adxm.pval <- cbind(rownames(adxm.pval), data.frame(adxm.pval, row.names=NULL))
 colnames(adxm.pval)[1] <- "species"

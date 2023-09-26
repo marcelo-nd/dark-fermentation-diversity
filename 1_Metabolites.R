@@ -4,11 +4,12 @@ library("ggplot2")
 library("ggthemes")
 library("dplyr")
 
+# Load auxiliary functions (available at https://github.com/marcelo-nd/microbiome-help)
 source("C:/Users/Marcelo/Documents/GitHub/microbiome-help/functional_data_helper_functions.R")
 
 # Biogas
 ####################################################################################
-# Biogas data exploration.
+# Biogas data graphs.
 
 biogas <- read_xlsx(path = "C:/Users/Marcelo/OneDrive - UT Cloud/Doctorado/DiversidadH2/Análisis/0_datos/alta_diversidad.xlsx", sheet = "biogas", range = "A68:O129")
 colnames(biogas) <- c("tiempo", "fecha", "semana", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
